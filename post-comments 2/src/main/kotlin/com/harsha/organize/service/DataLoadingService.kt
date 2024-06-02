@@ -37,17 +37,20 @@ class DataLoadingService(
         if (postDataList != null) {
             logger.info("Downloaded posts = {}", postDataList.size)
             for (postData in postDataList) {
-                val post = Post(
-                    id = postData.id,
+                val existingPost = postRepository.findById(postData.id.toLong())
+                if (existingPost != null){
+                    logger.info("already exist")
+                }
+                var post = Post(
                     userId = postData.userId,
                     name = postData.title,
                     body = postData.body,
                     createAt = LocalDateTime.now()
                 )
 
-                postRepository.save(post)
+                post = postRepository.save(post)
                 val commentDataList = webClient.get()
-                    .uri("${baseURL}/comments?postId=${postData.id}")
+                    .uri("${baseURL}/comments?postId=${post.id}")
                     .retrieve()
                     .toEntity<List<CommentData>>()
                     .awaitSingle()
@@ -57,7 +60,7 @@ class DataLoadingService(
                     logger.info("Downloaded comments for post {} = {}", postData.id, commentDataList.size)
                     for (commentData in commentDataList) {
                         val comment = Comment(
-                            id = commentData.id,
+                            postId = post.id!!,
                             name = commentData.name,
                             email = commentData.email,
                             body = commentData.body,
@@ -65,6 +68,7 @@ class DataLoadingService(
                         )
 
                         commentRepository.save(comment)
+                        logger.info("Comment is saved")
                     }
 
                 }

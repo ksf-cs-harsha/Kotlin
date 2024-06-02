@@ -11,3 +11,4 @@ interface CommentRepository : CoroutineCrudRepository<Comment, Int> {
     @Query("select * from comment where post_id = :postId")
     suspend fun findAllCommentsByPostId(postId: Int): List<Comment>
 }
+

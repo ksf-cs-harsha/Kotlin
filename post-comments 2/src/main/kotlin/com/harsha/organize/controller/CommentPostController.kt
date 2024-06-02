@@ -17,10 +17,9 @@ class CommentPostController(private val postService: PostService) {
             ?: throw ResourceNotFoundException("Post not found for the given id $postId")
         val commentsMap = postService.getCommentsByPostId(postId)
         val commentOutputs = commentsMap.map { comment ->
-            postId
-            CommentOutput(comment.id, comment.name, comment.email, comment.body)
+            CommentOutput(comment.id!!, comment.name!!, comment.email!!, comment.body)
         }
-        return PostOutput(optionalPost.id, optionalPost.userId, optionalPost.name, commentOutputs)
+        return PostOutput(optionalPost.id!!, optionalPost.userId, optionalPost.name, commentOutputs)
     }
 
     @GetMapping("/posts")
@@ -33,14 +32,14 @@ class CommentPostController(private val postService: PostService) {
         }
 
         val postOutputs = posts.map { post ->
-            val commentOutputs = postService.getCommentsByPostId(post.id).map { comment ->
-                CommentOutput(comment.id, comment.name, comment.email, comment.body)
+            val commentOutputs = postService.getCommentsByPostId(post.id!!).map { comment ->
+                CommentOutput(comment.id!!, comment.name!!, comment.email!!, comment.body)
             }
             if (commentOutputs.isEmpty()) {
                 throw ResourceNotFoundException("No comments found for post ${post.id}")
             }
 
-            PostOutput(post.id, post.userId, post.name, commentOutputs)
+            PostOutput(post.id!!, post.userId, post.name, commentOutputs)
         }
 
         val total = postService.postRepository.count()

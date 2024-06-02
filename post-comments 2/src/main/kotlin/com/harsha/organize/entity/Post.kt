@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 @Table(name = "post")
 data class Post(
     @Id
-    var id: Int,
+    var id: Int? = null,  // Use nullable type for auto-generated ID
     @Column(value = "user_id")
     var userId: Int,
     var name: String = "",
